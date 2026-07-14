@@ -35,7 +35,7 @@ export default function Booking() {
   const [color, setColor] = useState(0)
   const [cap, setCap] = useState(1)
   const [slot, setSlot] = useState(1)
-  const [secs, setSecs] = useState(47 * 3600 + 12 * 60 + 33)
+  const [secs, setSecs] = useState(23 * 3600 + 12 * 60 + 33)
 
   useEffect(() => {
     if (phase !== 'step3') return

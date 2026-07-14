@@ -22,14 +22,14 @@ export default function Compare() {
   }
 
   const minPrice = Math.min(...cols.map((c) => numeric(c.from)))
-  const maxBatt = Math.max(...cols.map((c) => parseInt(c.battery)))
+  const maxBatt = Math.max(...cols.map((c) => numeric(c.battery)))
 
   const rows = [
     { attr: 'أقل سعر', price: true },
     { attr: 'العلامة', get: (c) => c.brand },
     { attr: 'المعالج', get: (c) => c.chip },
     { attr: 'الشاشة', get: () => '6.7" OLED 120Hz', same: true },
-    { attr: 'البطارية', get: (c) => c.battery, win: (c) => parseInt(c.battery) === maxBatt },
+    { attr: 'البطارية', get: (c) => c.battery, win: (c) => numeric(c.battery) === maxBatt },
     { attr: 'عدد المتاجر', get: (c) => c.stores },
   ].filter((r) => !(hideSame && r.same))
 
