@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext.jsx'
 /**
  * Product card shared across home / search / favorites.
  * - Phone-body placeholder (no invented product photography)
- * - Favorite heart (star-red only when active — a "loss avoidance" cue)
+ * - Favorite heart (green when active — red is reserved for loss/urgency cases)
  * - Price + 7-day change badge (green = drop, red = rise)
  * - Optional "add to compare" toggle
  */
@@ -22,7 +22,7 @@ export default function ProductCard({ product, showCompare = false }) {
         className={[
           'absolute end-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border text-base transition-colors',
           isFav
-            ? 'border-star-tint bg-star-tint text-star'
+            ? 'border-green-tint bg-green-tint text-green'
             : 'border-line bg-white/90 text-muted hover:text-ink',
         ].join(' ')}
       >

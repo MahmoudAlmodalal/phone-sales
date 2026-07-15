@@ -185,7 +185,7 @@ export default function Product() {
         <div className="flex gap-2.5">
           <button
             onClick={() => toggleFavorite(product.id)}
-            className={['flex flex-1 items-center justify-center gap-1.5 rounded-field border py-2.5 text-[13px]', isFav ? 'border-star-tint bg-star-tint text-star' : 'border-line text-ink hover:border-green hover:text-green'].join(' ')}
+            className={['flex flex-1 items-center justify-center gap-1.5 rounded-field border py-2.5 text-[13px]', isFav ? 'border-green-tint bg-green-tint text-green' : 'border-line text-ink hover:border-green hover:text-green'].join(' ')}
           >♥ مفضلة</button>
           <button
             onClick={() => toggleCompare(product.id)}

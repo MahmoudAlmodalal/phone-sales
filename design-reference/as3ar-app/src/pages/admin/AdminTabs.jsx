@@ -35,7 +35,7 @@ export function Users() {
           <tr key={n}>
             <td className="border-t border-line px-3.5 py-3">{n}</td>
             <td className="border-t border-line px-3.5 py-3">{t}</td>
-            <td className="border-t border-line px-3.5 py-3"><span className={badge(st === 'قيد المراجعة' ? 'bg-star-tint text-star' : 'bg-green-tint text-green-deep')}>{st}</span></td>
+            <td className="border-t border-line px-3.5 py-3"><span className={badge(st === 'قيد المراجعة' ? 'bg-surface text-muted' : 'bg-green-tint text-green-deep')}>{st}</span></td>
             <td className="border-t border-line px-3.5 py-3"><button className={['font-semibold', ac === 'star' ? 'text-star' : 'text-green'].join(' ')}>{action}</button></td>
           </tr>
         ))}
