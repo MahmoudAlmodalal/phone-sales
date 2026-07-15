@@ -18,6 +18,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 type SessionState = {
   role: Role;
+  hydrated: boolean;
   login: (role?: Role) => void;
   logout: () => void;
 };
@@ -26,6 +27,7 @@ export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
       role: 'guest',
+      hydrated: false,
       login: (role = 'user') => set({ role }),
       logout: () => set({ role: 'guest' }),
     }),
@@ -33,6 +35,10 @@ export const useSessionStore = create<SessionState>()(
       name: 'as3ar_role',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : (undefined as unknown as Storage))),
       skipHydration: true,
+      partialize: (s) => ({ role: s.role }),
+      onRehydrateStorage: () => () => {
+        useSessionStore.setState({ hydrated: true });
+      },
     }
   )
 );
