@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#3730A3" />
+    </linearGradient>
+    <clipPath id="circleClip3">
+      <circle cx="60" cy="60" r="56" />
+    </clipPath>
+  </defs>
+  <circle cx="60" cy="60" r="58" fill="url(#bg3)" />
+  <g clip-path="url(#circleClip3)">
+    <!-- Clothing / Hoodie -->
+    <path d="M22 120 C22 92 40 82 60 82 C80 82 98 92 98 120 Z" fill="#EEF2FF" />
+    <circle cx="60" cy="94" r="10" fill="#E0E7FF" />
+    <!-- Neck -->
+    <rect x="52" y="66" width="16" height="18" rx="4" fill="#E9B796" />
+    <!-- Head -->
+    <ellipse cx="60" cy="50" rx="21" ry="24" fill="#E9B796" />
+    <!-- Short Curly Hair -->
+    <path d="M38 46 C38 24 50 20 60 20 C70 20 82 24 82 46 C82 34 74 27 60 27 C46 27 38 34 38 46 Z" fill="#18181B" />
+    <!-- Glasses -->
+    <rect x="44" y="44" width="13" height="11" rx="3" fill="none" stroke="#18181B" stroke-width="2" />
+    <rect x="63" y="44" width="13" height="11" rx="3" fill="none" stroke="#18181B" stroke-width="2" />
+    <line x1="57" y1="49" x2="63" y2="49" stroke="#18181B" stroke-width="2" />
+    <!-- Eyes behind glasses -->
+    <circle cx="50.5" cy="49.5" r="2" fill="#18181B" />
+    <circle cx="69.5" cy="49.5" r="2" fill="#18181B" />
+    <!-- Smile -->
+    <path d="M54 62 Q60 67 66 62" stroke="#7C4A3A" stroke-width="2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>

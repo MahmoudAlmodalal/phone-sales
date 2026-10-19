@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" width="320" height="420">
+  <defs>
+    <linearGradient id="s24b-chassis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#262626" />
+      <stop offset="50%" stop-color="#404040" />
+      <stop offset="100%" stop-color="#171717" />
+    </linearGradient>
+    <linearGradient id="s24b-wp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181B" />
+      <stop offset="50%" stop-color="#27272A" />
+      <stop offset="100%" stop-color="#09090B" />
+    </linearGradient>
+    <filter id="phone-shadow-s24b" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0E1311" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#phone-shadow-s24b)">
+    <!-- Body Frame -->
+    <rect x="62" y="27" width="196" height="366" rx="26" fill="url(#s24b-chassis)" stroke="#52525B" stroke-width="1.2" />
+    <rect x="258" y="115" width="4" height="38" rx="2" fill="#27272A" />
+    <rect x="258" y="165" width="4" height="26" rx="2" fill="#27272A" />
+
+    <!-- Screen -->
+    <g clip-path="url(#s24b-clip)">
+      <clipPath id="s24b-clip">
+        <rect x="67" y="32" width="186" height="356" rx="22" />
+      </clipPath>
+      <rect x="67" y="32" width="186" height="356" fill="url(#s24b-wp)" />
+      
+      <!-- Minimalist Dark Spheres Wallpaper -->
+      <circle cx="160" cy="220" r="75" fill="#3B82F6" opacity="0.3" filter="blur(25px)" />
+      <circle cx="180" cy="170" r="45" fill="#8B5CF6" opacity="0.4" filter="blur(20px)" />
+      <polygon points="120,180 180,240 140,290" fill="#E4E4E7" opacity="0.15" />
+
+      <!-- Punch Hole -->
+      <circle cx="160" cy="45" r="3.2" fill="#000000" />
+      <circle cx="160" cy="45" r="1.1" fill="#3B82F6" opacity="0.8" />
+
+      <!-- Clock -->
+      <text x="160" y="90" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">10:08</text>
+      <text x="160" y="108" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#A1A1AA" text-anchor="middle">الرياض · ٢٩°</text>
+
+      <rect x="135" y="376" width="50" height="3" rx="1.5" fill="#FFFFFF" opacity="0.5" />
+    </g>
+  </g>
+</svg>

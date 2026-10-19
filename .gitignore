@@ -7,3 +7,9 @@ vendor/
 dbdata/
 .DS_Store
 *.log
+
+# Spec Kit
+.specify/
+.agents/
+.claude/skills/speckit-*
+/AGENTS.md

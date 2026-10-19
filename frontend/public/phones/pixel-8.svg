@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" width="320" height="420">
+  <defs>
+    <linearGradient id="px8-chassis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A3B19B" />
+      <stop offset="50%" stop-color="#84947C" />
+      <stop offset="100%" stop-color="#586851" />
+    </linearGradient>
+    <linearGradient id="px8-wp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D3B27" />
+      <stop offset="50%" stop-color="#475C3E" />
+      <stop offset="100%" stop-color="#1B2417" />
+    </linearGradient>
+    <filter id="phone-shadow-px8" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0E1311" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#phone-shadow-px8)">
+    <rect x="63" y="27" width="194" height="366" rx="30" fill="url(#px8-chassis)" stroke="#CBD5C5" stroke-width="1.2" />
+    <rect x="257" y="105" width="4" height="26" rx="2" fill="#586851" />
+    <rect x="257" y="145" width="4" height="42" rx="2" fill="#586851" />
+
+    <g clip-path="url(#px8-clip)">
+      <clipPath id="px8-clip">
+        <rect x="68" y="32" width="184" height="356" rx="25" />
+      </clipPath>
+      <rect x="68" y="32" width="184" height="356" fill="url(#px8-wp)" />
+      
+      <!-- Material You Minerals Wallpaper -->
+      <path d="M100 180 Q160 120 220 200 T180 340 Z" fill="#D5E7CE" opacity="0.3" filter="blur(20px)" />
+      <circle cx="130" cy="240" r="50" fill="#E8F5E9" opacity="0.25" filter="blur(15px)" />
+
+      <!-- Punch Hole -->
+      <circle cx="160" cy="46" r="3.2" fill="#000000" />
+      <circle cx="160" cy="46" r="1.1" fill="#4ADE80" opacity="0.8" />
+
+      <!-- At a Glance Widget -->
+      <text x="160" y="85" font-family="system-ui, sans-serif" font-size="28" font-weight="600" fill="#FFFFFF" text-anchor="middle">09:30</text>
+      <text x="160" y="105" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#D5E7CE" text-anchor="middle">الرياض · ٢٦° غائم جزئياً</text>
+
+      <rect x="135" y="376" width="50" height="3" rx="1.5" fill="#FFFFFF" opacity="0.6" />
+    </g>
+  </g>
+</svg>

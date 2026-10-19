@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" width="320" height="420">
+  <defs>
+    <linearGradient id="pura-chassis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="50%" stop-color="#CBD5E1" />
+      <stop offset="100%" stop-color="#94A3B8" />
+    </linearGradient>
+    <linearGradient id="pura-wp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <filter id="phone-shadow-pura" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0E1311" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#phone-shadow-pura)">
+    <rect x="63" y="27" width="194" height="366" rx="26" fill="url(#pura-chassis)" stroke="#F8FAFC" stroke-width="1.2" />
+    <rect x="257" y="115" width="4" height="40" rx="2" fill="#94A3B8" />
+
+    <g clip-path="url(#pura-clip)">
+      <clipPath id="pura-clip">
+        <rect x="68" y="32" width="184" height="356" rx="22" />
+      </clipPath>
+      <rect x="68" y="32" width="184" height="356" fill="url(#pura-wp)" />
+      
+      <!-- Triangular Forward Waves Wallpaper -->
+      <polygon points="160,180 230,260 90,260" fill="#E2E8F0" opacity="0.3" filter="blur(20px)" />
+      <circle cx="160" cy="220" r="45" fill="#38BDF8" opacity="0.25" filter="blur(15px)" />
+
+      <!-- Triple Punch Hole XMAGE -->
+      <circle cx="148" cy="45" r="2.8" fill="#000000" />
+      <circle cx="160" cy="45" r="2.8" fill="#000000" />
+      <circle cx="172" cy="45" r="2.8" fill="#000000" />
+
+      <!-- Clock -->
+      <text x="160" y="90" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">08:08</text>
+      <text x="160" y="108" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#E2E8F0" text-anchor="middle">HUAWEI XMAGE · Pura 70</text>
+
+      <rect x="135" y="376" width="50" height="3" rx="1.5" fill="#FFFFFF" opacity="0.6" />
+    </g>
+  </g>
+</svg>

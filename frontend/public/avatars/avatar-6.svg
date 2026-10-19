@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <clipPath id="circleClip6">
+      <circle cx="60" cy="60" r="56" />
+    </clipPath>
+  </defs>
+  <circle cx="60" cy="60" r="58" fill="url(#bg6)" />
+  <g clip-path="url(#circleClip6)">
+    <!-- Suit / Formal -->
+    <path d="M22 120 C22 92 40 82 60 82 C80 82 98 92 98 120 Z" fill="#1E293B" />
+    <polygon points="50,84 60,112 70,84 60,78" fill="#F8FAFC" />
+    <polygon points="57,84 60,105 63,84 60,80" fill="#007A3D" />
+    <!-- Neck -->
+    <rect x="52" y="66" width="16" height="18" rx="4" fill="#F3CBB1" />
+    <!-- Head -->
+    <ellipse cx="60" cy="50" rx="21" ry="24" fill="#F3CBB1" />
+    <!-- Styled side-part Hair -->
+    <path d="M37 44 C37 26 48 20 60 20 C74 20 83 26 83 44 C83 34 76 26 62 26 C48 26 38 32 37 44 Z" fill="#475569" />
+    <path d="M36 40 Q48 30 65 34 Q50 24 36 40 Z" fill="#334155" />
+    <!-- Eyes -->
+    <circle cx="51" cy="49" r="2.5" fill="#0F172A" />
+    <circle cx="69" cy="49" r="2.5" fill="#0F172A" />
+    <circle cx="52" cy="48" r="0.8" fill="#FFFFFF" />
+    <circle cx="70" cy="48" r="0.8" fill="#FFFFFF" />
+    <!-- Confident Smile -->
+    <path d="M54 61 Q60 66 66 61" stroke="#8D5B4C" stroke-width="2" stroke-linecap="round" fill="none" />
+  </g>
+</svg>

@@ -1,80 +1,92 @@
-# Phase 06 — Frontend Foundation (Porting the Prototype)
+# Phase 06 — Frontend Integration Foundation
 
-**Goal:** port the `design-reference/as3ar-app` prototype's shell into Next.js App
-Router: layout, shared components, state stores, typed API client, formatters.
-After this phase every page phase (07–09, 14–18) plugs into a ready skeleton.
+**Goal:** turn the existing mock-data frontend into an API-driven app skeleton:
+a typed API client, real session/favorites stores, formatters audit, and route
+scaffolds for the pages that don't exist yet. After this phase every page phase
+(07–09, 14–18) plugs into a ready, typed foundation. NO porting — the UI shell
+(Navbar, Footer, components, tokens) already exists.
 
-**Prerequisites:** Phase 01 (scaffold). Phases 04/05 APIs helpful but mockable.
+**Depends on:** 01. Phase 05 endpoint contracts are the type source (mock them
+if 05 isn't deployed yet).
 
-## Route map (React Router → App Router)
+**Produces:** typed `lib/api.ts`, updated stores, route scaffolds, kitchen-sink
+coverage of shared components.
 
-| Prototype route | Next.js path | Rendering |
-|---|---|---|
-| `/` | `src/app/(public)/page.tsx` | SSR + streaming |
-| `/search` | `(public)/search/page.tsx` | SSR (searchParams) |
-| `/product/:id` | `(public)/product/[slug]/page.tsx` | SSR + `generateMetadata` |
-| `/compare` | `(public)/compare/page.tsx` | client (reads compare store) |
-| `/booking/:id` | `(public)/booking/[number]/page.tsx` | SSR + client countdown |
-| — (new) | `(public)/store/[slug]/page.tsx` | SSR (store profile + reviews) |
-| `/login` | `(public)/login/page.tsx` | client form |
-| `/account/*` | `account/(tabs)` layout + pages | client, guarded |
-| `/vendor/*` | `vendor/(tabs)` layout + pages | client, guarded |
-| `/admin/*` | `admin/(tabs)` layout + pages | client, guarded |
-| `*` | `not-found.tsx` | 404 per brief §2.10 (search field) |
+## Context for the agent
 
-## Tasks
+- Existing and to be REUSED as-is: `src/components/*` (all), `src/stores/*`,
+  `src/lib/format.ts`, `src/lib/mock-data.ts` (to be phased out page by page —
+  do not delete it here; pages still importing it must keep working).
+- Existing routes are top-level (`app/search`, `app/login`, …) — keep that
+  structure; do NOT introduce a (public) route group.
+- Missing routes to scaffold: `product/[slug]`, `store/[slug]`,
+  `booking/[number]` and a booking start page, the entire `vendor/*` section.
 
-### 1. Layout shell (port 1:1 visually)
-- [ ] `components/Navbar.tsx` ← `Navbar.jsx`: sticky green header — logo (3 red stars
-      mark), links (تصفح، البائعون), search shortcut, auth area; mobile hamburger.
-- [ ] `components/Footer.tsx` ← `Footer.jsx`: ink-black footer, link columns, thin
-      trust bar above it.
-- [ ] `components/Star.tsx` ← `Star.jsx`: the signature star (filled/outline/size props).
-- [ ] `(public)/layout.tsx`: Navbar + children + CompareBar + Footer.
-- [ ] `components/DashboardLayout.tsx` ← prototype version: horizontal tabs + content
-      area — reused by account/vendor/admin layouts with their tab lists.
-- [ ] Do **not** port `DevRoleSwitcher.jsx` / `PlaceholderPage.jsx` (dev artifacts).
+## Steps
 
-### 2. Shared components (port + typed props)
-- [ ] `ProductCard.tsx` ← `ProductCard.jsx` — accepts the `ProductCard` API shape
-      (phase 05): image, name, "ابتداءً من" best price (Mono 24px), drop/rise badge,
-      "من ٧ متاجر · فرق ٢٣٠" muted line, ♡ favorite, ☐ add-to-compare.
-- [ ] `PriceTicker.tsx` ← `PriceTicker.jsx` — marquee row, Mono prices, green ▼ /
-      red ▲ + pct; pauses on hover and under `prefers-reduced-motion`; stale state.
-- [ ] `CompareBar.tsx` ← `CompareBar.jsx` — fixed bottom 72px ink bar (phase 09 wires it).
-- [ ] `Badge.tsx` (drop green-tint / rise star-tint / موثّق star), `Skeleton.tsx`
-      (pulsing surface rectangles), `Toast.tsx` (grey neutral + red destructive),
-      `EmptyState.tsx` (icon + Arabic CTA per brief §2.10), `RatingBar.tsx`
-      (number + horizontal bar + count — NEVER stars), `Countdown.tsx`
-      (Mono, star-tint bg — used by booking + dashboards).
+### S1 — Typed API client
+- **Do:** Extend `src/lib/api.ts` into a full client: a generic fetch helper
+  taking a path and init, base URL from env, bearer attachment from the
+  httpOnly cookie on the server (client mutations go through route-handler
+  proxies), envelope normalization (data/meta), and a typed ApiError carrying
+  422 field errors and the typed `code` values from 00 §5. Add typed wrappers
+  for the phase-05 contracts: home, products list, product detail, price
+  history, suggest, categories, brands, compared. Define the shared TypeScript
+  interfaces (card shape aligned with ProductCard props).
+- **Touch:** `frontend/src/lib/api.ts`, `frontend/src/lib/types.ts` (new).
+- **Done when:** `npm run build` passes; the kitchen-sink page renders one
+  ProductCard from a live (or mocked) products call.
 
-### 3. State (replaces prototype `AppContext`)
-- [ ] `stores/compare.ts` (Zustand + `sessionStorage` persist): ids ≤ 4,
-      `toggle/clear`, toast on 5th ("المقارنة تتّسع لأربعة. أزل واحدًا أولًا.").
-- [ ] `stores/favorites.ts`: optimistic toggle → API when authed, localStorage for
-      guests + merge-on-login.
-- [ ] Session: server-side via httpOnly cookie (phase 04); client hook `useSession()`
-      reads `/api/session` (role, name, status) — SWR-style revalidation.
+### S2 — Stores wired to reality
+- **Do:** compare store: keep sessionStorage persistence, cap at 4 with the
+  grey toast «المقارنة تتّسع لأربعة. أزل واحدًا أولًا.» on the 5th, store
+  minimal card data (id, slug, name_ar, image, best_price) so the bar renders
+  without refetch, and fire the compared ping on add. favorites store:
+  optimistic toggle calling the API when authed (phase 10 endpoints — stub the
+  call behind an interface for now), localStorage for guests, and a
+  merge-on-login hook. session store: confirm the phase-04 wiring (or leave a
+  clearly-marked mock behind the same interface if 04 isn't done).
+- **Touch:** `frontend/src/stores/compare.ts`, `frontend/src/stores/favorites.ts`,
+  `frontend/src/stores/session.ts`.
+- **Done when:** adding a 5th compare item shows the toast; compare state
+  survives navigation; guest favorites persist across reloads.
 
-### 4. API client & formatters
-- [ ] `lib/api.ts`: `apiFetch<T>(path, init?)` — base URL from env, attaches bearer
-      from cookie (server) / relies on route-handler proxy (client mutations),
-      normalizes `{data, meta}`, throws typed `ApiError` (422 field errors).
-      Typed wrappers: `getHome()`, `getProducts(params)`, `getProduct(slug)`, `suggest(q)`, ….
-- [ ] `lib/format.ts`:
-      `money(1150)` → `"١٬١٥٠ ر.س"` **digits kept Latin in Mono per design (1,150)** —
-      decide once: brief mockups use Latin digits in Mono; use `Intl.NumberFormat('ar-SA-u-nu-latn')`.
-      `pct(-4.1)` → `▼ 4.1%`, `relTime(date)` → "قبل ٧ دقائق", `date(d)` → "١٢ مارس".
-      All numeric spans get `dir="ltr"` + `font-mono`.
+### S3 — Formatters audit
+- **Do:** Verify `src/lib/format.ts` covers: money (Latin digits in Mono per
+  the design — Intl with ar-SA and Latin numerals), percent with direction
+  glyphs (▼ 4.1%), relative time («قبل ٧ دقائق»), short date («١٢ مارس»). All
+  numeric spans render LTR in Mono. Add whatever is missing; add unit tests if
+  a test runner exists, otherwise a kitchen-sink section showing each
+  formatter output.
+- **Touch:** `frontend/src/lib/format.ts`, kitchen-sink page.
+- **Done when:** kitchen-sink shows correct output for each formatter,
+  including negative percents and stale dates.
 
-### 5. Global chrome
-- [ ] `not-found.tsx`: «هذه الصفحة غير موجودة…» + search field.
-- [ ] `error.tsx`: «تعذّر تحميل الأسعار. نحاول مجددًا خلال ثوانٍ.» + auto retry button.
-- [ ] Offline banner component (grey top bar) via `navigator.onLine` listener.
+### S4 — Missing route scaffolds
+- **Do:** Create minimal, typed page scaffolds (real layout chrome, skeleton
+  content, correct metadata titles) for: `app/product/[slug]/page.tsx`,
+  `app/store/[slug]/page.tsx`, `app/booking/[number]/page.tsx`, a booking
+  start route (`app/booking/new/page.tsx`), and the vendor section —
+  `app/vendor/layout.tsx` using the existing DashboardLayout with tabs
+  (نظرة عامة · منتجاتي · الاستيراد · الحجوزات · متجري · الربط التقني) plus
+  stub pages for each tab. Guarded by the middleware from phase 04 (or
+  RoleGuard until 04 lands).
+- **Touch:** `frontend/src/app/product/[slug]/*`, `frontend/src/app/store/[slug]/*`,
+  `frontend/src/app/booking/*`, `frontend/src/app/vendor/*`.
+- **Done when:** every route renders its scaffold with Navbar/Footer or
+  dashboard chrome and no console errors; `npm run build` passes.
 
-## Definition of Done
-- [ ] All routes render (pages can be stubs) with real Navbar/Footer, RTL, fonts.
-- [ ] ProductCard renders correctly from a mocked API item (Storybook-less: a `/dev/kitchen-sink`
-      page listing every shared component in all states — kept out of prod build).
-- [ ] Compare store: adding 5th item shows the grey toast; state survives navigation.
-- [ ] `npm run build` passes with zero TS errors.
+### S5 — Global chrome check
+- **Do:** Verify (and fix where missing): `not-found.tsx` («هذه الصفحة غير
+  موجودة…» + search field per brief §2.10), `error.tsx` («تعذّر تحميل
+  الأسعار…» + retry), an offline grey top banner driven by the browser online
+  event. These mostly exist — this is an audit step, not a rebuild.
+- **Touch:** `frontend/src/app/not-found.tsx`, `frontend/src/app/error.tsx`,
+  `frontend/src/components/ChromeExtras.tsx`.
+- **Done when:** visiting a bogus URL shows the 404 with a working search
+  field; killing the network shows the offline banner.
+
+## Phase acceptance
+- `npm run build` passes with zero TS errors; all routes (existing + new
+  scaffolds) render; compare/favorites behaviors verified in the browser;
+  kitchen-sink shows every shared component and formatter state.

@@ -1,81 +1,131 @@
 # Phase 05 — Catalog API (Public Read Endpoints)
 
-**Goal:** every public read the frontend needs: browse, advanced search + live
-suggestions, product detail with cheapest-first store table, price history,
-home-page sections, ticker, and affiliate click tracking.
+**Goal:** every public read the frontend needs: browse, advanced search with
+live suggestions, product detail with cheapest-first store table, price
+history, home-page sections, ticker, and affiliate click tracking.
 
-**Prerequisites:** Phase 03 (seeded data).
+**Depends on:** 03 (seeded data).
 
-## Endpoints (all public, cached where noted)
+**Produces:** all public endpoints below, ProductQueryBuilder service, API
+resources, docs/api.http examples.
 
-### GET `/api/categories`
-Nested tree `{id, name, slug, icon, children[]}` — cached 10 min.
+## Context for the agent
 
-### GET `/api/brands`
-`{id, name, name_ar, slug, logo}` list.
+- Response card shape MUST match the props of the existing
+  `frontend/src/components/ProductCard.tsx` (read it first; align names, don't
+  invent parallel fields).
+- /go/{price_id} is a WEB route (00 §5), not under /api.
 
-### GET `/api/products` — the search/list endpoint
-Query params:
-- `q` (matches name/name_ar/brand, pg `ILIKE` + trigram index)
-- `category` (slug; includes descendant categories), `brands[]`
-- `price_min`, `price_max` (against best available price)
-- `specs[storage][]`, `specs[ram][]`, `specs[screen][]`, `specs[battery][]` (JSONB filters)
-- `store` (slug), `rating_min` (store rating — SRS filter), `bookable=1` (any stock>0),
-  `dropped=7d` (price fell in last 7 days)
-- `sort`: `cheapest` (default) | `biggest_drop` | `most_viewed` | `most_compared` | `newest`
-- `cursor`, `per_page` (≤50) — cursor pagination for continuous scroll (SRS §2)
+## Endpoint contracts
 
-Response item (card shape — matches `ProductCard`):
-```json
-{ "id": 1, "slug": "samsung-galaxy-s24-ultra", "name_ar": "جالكسي S24 ألترا",
-  "brand": "Samsung", "image": "...", "best_price": 1150.00,
-  "stores_count": 7, "price_spread": 230.00, "drop_7d_pct": -4.1, "bookable": true }
-```
-`price_spread` = max−min available price (the "فرق ٢٣٠" line — key differentiator per brief §2.2).
-Implementation: single query with subselects / a `product_price_summary` SQL view; avoid N+1.
+### GET /api/categories
+Nested tree — id, name, slug, icon, children. Cached 10 min.
 
-### GET `/api/products/{slug}` — product detail
-`{product (name, description, specs grouped, images, category, brand),
-  best_price {price, store{name,slug}, updated_ago},
-  prices: [ {store{name, slug, rating_avg, rating_count, city, is_verified},
-             price, stock, is_available, affiliate_url→null (use /go/), last_synced_at} ]
-             — ordered cheapest→highest, unavailable kept in place greyed (brief §2.3),
-  lowest_ever {price, date}, stats {views, compares} }`
-Side effect: increment `views_count` + upsert `product_stats` (throttled per session).
+### GET /api/brands
+List — id, name, name_ar, slug, logo.
 
-### GET `/api/products/{slug}/price-history?range=30|90|365`
-`{ series: [{date, price, store}], min, max, avg, min_point {price, date} }`
-— powers the chart + the "أدنى سعر مسجّل: ١,٠٩٠ في ١٢ مارس" sentence.
+### GET /api/products — search/list
+Query params: q (name/name_ar/brand, case-insensitive with trigram index);
+category (slug, includes descendants); brands[]; price_min/price_max (against
+best available price); specs[storage][], specs[ram][], specs[screen][],
+specs[battery][] (JSONB filters); store (slug); rating_min (store rating — SRS
+filter); bookable=1 (any stock>0); dropped=7d (price fell in last 7 days);
+sort: cheapest (default) | biggest_drop | most_viewed | most_compared | newest;
+cursor, per_page (≤50).
 
-### GET `/api/suggest?q=…` — live suggestions (brief §2.2)
-≤8 results grouped: `{products:[{name_ar, slug, image, best_price}], brands:[…], stores:[…]}`.
-Target < 80ms: trigram indexes on names; cache hot prefixes 60s. Frontend debounces 200ms.
+Response item (card shape): id, slug, name_ar, brand, image, best_price,
+stores_count, price_spread (max−min available — the «فرق ٢٣٠» differentiator,
+brief §2.2), drop_7d_pct, bookable. Implementation: one query with subselects
+or a summary SQL view — no N+1.
 
-### GET `/api/home` — one call for the whole homepage
-`{ ticker: [12 top movers {name_ar, slug, best_price, change_pct}],
-   last_update_minutes, biggest_drops: [8 cards], most_viewed: [8], most_compared: [8],
-   best_deals: [8 — biggest spread], categories: chips,
-   trust: {stores, products, price_points} }` — cached 5 min.
-Ticker empty-state contract: if the latest sync failed, `ticker_status: 'stale'` +
-`last_success_at` (frontend shows grey "الأسعار قيد التحديث…" — never red).
+### GET /api/products/{slug} — detail
+Product (name, description, grouped specs, images, category, brand);
+best_price (price, store name+slug, updated-ago); prices array ordered
+cheapest→highest with unavailable rows kept in place (brief §2.3) — each row:
+store (name, slug, rating_avg, rating_count, city, is_verified), price, stock,
+is_available, go_id (the price id for /go/ — raw affiliate_url is never
+exposed), last_synced_at; lowest_ever (price, date); stats (views, compares).
+Side effect: increment views_count + upsert product_stats (throttled per
+session).
 
-### GET `/go/{product_price_id}` — affiliate redirect + click tracking (SRS: vendor click stats)
-302 → the stored `affiliate_url`; increments `product_stats.clicks` (daily upsert)
-and campaign clicks if `?ad=` present. Rate-limit 30/min/IP. Web route, not API.
+### GET /api/products/{slug}/price-history?range=30|90|365
+Series of (date, price, store) + min, max, avg, min_point (price, date) —
+powers the chart and the «أدنى سعر مسجّل» sentence.
 
-### POST `/api/products/{slug}/compared`
-Fire-and-forget increment of `compares_count` (called when a product is added to compare).
+### GET /api/suggest?q=…
+≤8 results grouped: products (name_ar, slug, image, best_price), brands,
+stores. Fast path: trigram indexes + 60s cache on hot prefixes; frontend
+debounces 200ms.
 
-## Backend tasks
-- [ ] `pg_trgm` extension migration + trigram indexes on `products.name`, `name_ar`, `brands.name`.
-- [ ] `ProductQueryBuilder` service encapsulating filters/sorts (unit-testable).
-- [ ] API Resources: `ProductCardResource`, `ProductDetailResource`, `PriceRowResource`.
-- [ ] Response caching (`Cache::remember`) for `/home`, `/categories`; bust on price sync.
-- [ ] Tests: each filter & sort returns expected seeded products; spread math; suggest
-      grouping; `/go/` increments clicks and redirects; detail orders cheapest-first
-      with unavailable greyed-in-place data intact.
+### GET /api/home
+ticker (12 top movers: name_ar, slug, best_price, change_pct),
+last_update_minutes, biggest_drops (8 cards), most_viewed (8), most_compared
+(8), best_deals (8 biggest spread), categories chips, trust counters (stores,
+products, price_points). Cached 5 min. Ticker contract: if the latest sync
+failed, add ticker_status "stale" + last_success_at — frontend shows the grey
+«الأسعار قيد التحديث…» state, never red.
 
-## Definition of Done
-- [ ] All endpoints return documented shapes (add `docs/api.http` examples file).
-- [ ] `GET /api/products?sort=biggest_drop` surfaces the seeded big-drop products.
-- [ ] p95 < 150ms locally for `/api/products` on seeded data (check with `ab` or timing middleware).
+### GET /go/{product_price_id} — web route
+302 redirect to the stored affiliate_url; increments product_stats.clicks
+(daily upsert) and campaign clicks when an ad param is present. Rate-limit
+30/min/IP.
+
+### POST /api/products/{slug}/compared
+Fire-and-forget increment of compares_count (called when a product is added to
+compare).
+
+## Steps
+
+### S1 — Search infrastructure
+- **Do:** Migration enabling the pg_trgm extension + trigram indexes on
+  products.name, products.name_ar, brands.name. A ProductQueryBuilder service
+  class encapsulating every filter and sort above (unit-testable in
+  isolation).
+- **Touch:** migration, `backend/app/Services/ProductQueryBuilder.php`.
+- **Done when:** unit tests cover each filter and each sort against seeded
+  data.
+
+### S2 — List, categories, brands endpoints
+- **Do:** Implement /api/products (cursor pagination), /api/categories
+  (cached), /api/brands, with API resources for the card shape.
+- **Touch:** controllers, `backend/app/Http/Resources/*`, routes.
+- **Done when:** sort=biggest_drop surfaces the seeded big-drop products;
+  spread math verified against a hand-computed product.
+
+### S3 — Product detail + price history
+- **Do:** Implement /api/products/{slug} (ordering + greyed-in-place
+  unavailable rows + view counting side effect) and the price-history endpoint
+  with range switching.
+- **Touch:** controllers, resources.
+- **Done when:** detail rows come back cheapest-first with unavailable rows in
+  position; min_point matches the seeded historical low for a sampled product.
+
+### S4 — Suggest + home
+- **Do:** Implement /api/suggest (grouped, ≤8) and /api/home (all sections,
+  5-min cache, stale-ticker contract). Cache busting hook: clearing the home
+  cache is a named action later called by the ingestion phase.
+- **Touch:** controllers, cache keys.
+- **Done when:** suggest for "s24" returns grouped results; /api/home returns
+  every section from seed data; manually marking the latest sync_log failed
+  makes ticker_status stale.
+
+### S5 — Click tracking web route
+- **Do:** Implement GET /go/{price_id} in the web routes: 302 + click upsert +
+  optional ad campaign click, rate-limited 30/min/IP.
+- **Touch:** `backend/routes/web.php`, controller.
+- **Done when:** hitting /go/ redirects and increments the day's clicks row
+  exactly once per hit.
+
+### S6 — Contract documentation + tests
+- **Do:** Write docs/api.http with a working example request per endpoint.
+  Feature tests: each filter & sort returns expected seeded products; suggest
+  grouping; /go/ increments and redirects; detail ordering; compared
+  increment.
+- **Touch:** `backend/docs/api.http`, `backend/tests/Feature/Catalog*`.
+- **Done when:** catalog test suite green; every endpoint in docs/api.http
+  returns 200 against the seeded dev server.
+
+## Phase acceptance
+- All endpoints return the documented shapes; the card shape matches
+  ProductCard.tsx props; /api/products responds quickly on seeded data
+  (measure with timing middleware — investigate anything over ~150ms locally).

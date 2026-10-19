@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" width="320" height="420">
+  <defs>
+    <linearGradient id="honor-chassis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF" />
+      <stop offset="50%" stop-color="#0F766E" />
+      <stop offset="100%" stop-color="#115E59" />
+    </linearGradient>
+    <linearGradient id="honor-wp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#042F2E" />
+      <stop offset="50%" stop-color="#134E4A" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <filter id="phone-shadow-honor" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0E1311" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <g filter="url(#phone-shadow-honor)">
+    <rect x="63" y="27" width="194" height="366" rx="26" fill="url(#honor-chassis)" stroke="#5EEAD4" stroke-width="1.2" />
+    <rect x="257" y="115" width="4" height="40" rx="2" fill="#115E59" />
+
+    <g clip-path="url(#honor-clip)">
+      <clipPath id="honor-clip">
+        <rect x="68" y="32" width="184" height="356" rx="22" />
+      </clipPath>
+      <rect x="68" y="32" width="184" height="356" fill="url(#honor-wp)" />
+      
+      <!-- Star Wheel / Nature Curves -->
+      <circle cx="160" cy="220" r="70" fill="#2DD4BF" opacity="0.3" filter="blur(25px)" />
+      <path d="M68 260 Q160 160 252 260 L252 388 L68 388 Z" fill="#14B8A6" opacity="0.25" />
+
+      <!-- Pill Shaped Front Camera + 3D ToF -->
+      <rect x="145" y="44" width="30" height="12" rx="6" fill="#000000" />
+      <circle cx="168" cy="50" r="2.5" fill="#115E59" />
+      <circle cx="152" cy="50" r="2" fill="#042F2E" />
+
+      <!-- Clock -->
+      <text x="160" y="90" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">08:08</text>
+      <text x="160" y="108" font-family="system-ui, sans-serif" font-size="10" font-weight="500" fill="#99F6E4" text-anchor="middle">MagicOS · 180MP Periscope</text>
+
+      <rect x="135" y="376" width="50" height="3" rx="1.5" fill="#FFFFFF" opacity="0.6" />
+    </g>
+  </g>
+</svg>

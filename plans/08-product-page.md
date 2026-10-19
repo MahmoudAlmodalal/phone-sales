@@ -1,79 +1,112 @@
-# Phase 08 — Product Details Page
+# Phase 08 — Product Details Page (New Build) + Store Profile
 
-**Goal:** the conversion core (brief §2.3, SRS §2): all store prices cheapest-first,
-price history with insight sentence, alert box, sticky action card, verified store
-ratings — SSR for SEO.
+**Goal:** the conversion core (brief §2.3, SRS §2): all store prices
+cheapest-first, price history with the insight sentence, alert box, sticky
+action card, verified store ratings — SSR for SEO. This page does NOT exist
+yet (only an empty `app/product/[slug]/` folder from phase 06) — it is a full
+build, reusing the existing shared components.
 
-**Prerequisites:** Phases 05, 06.
+**Depends on:** 05, 06.
 
-## Layout `(public)/product/[slug]/page.tsx`
-Two columns ≥lg: content 60% (right in RTL) + sticky card 40% (left). Stacked on mobile
-(card becomes a bottom sticky bar with best price + CTA).
+**Produces:** `/product/[slug]`, `/store/[slug]`, PriceChart component,
+ProductJsonLd component.
 
-## 1. Sticky best-price card
-- [ ] «أفضل سعر الآن» label; price Mono 36px green; «متجر التقنية · محدّث قبل ٣ د».
-- [ ] Primary solid green CTA **«اذهب إلى المتجر»** → `/go/{price_id}` (new tab).
-      Below it the disclosure line (12px muted): «قد نحصل على عمولة من هذا الرابط.
-      السعر لا يتغيّر عليك.»
-- [ ] Secondary outlined green **«احجز مسبقًا»** → `/booking/new?product=…&store=…`
-      (phase 11) — hidden if no store has stock.
-- [ ] Row: ♡ مفضلة (favorites store / API) · ⇄ قارن (compare store, pings `/compared`).
+## Context for the agent
 
-## 2. Product header + gallery
-- [ ] Name (Tajawal 32), brand + category breadcrumb links, image gallery
-      (main + thumbs, `next/image`).
+- Reuse: `RatingBar.tsx`, `Badge.tsx`, `Star.tsx`, `Skeleton.tsx`,
+  `ProductPageActions.tsx` (exists — check what it already covers),
+  compare/favorites stores.
+- Layout: two columns ≥lg — content 60% (right in RTL) + sticky card 40%
+  (left); stacked on mobile with a bottom sticky bar (best price + CTA).
 
-## 3. Store price table (the SRS "smart dynamic table")
-Columns: المتجر | السعر (Mono) | التوفر | آخر تحديث | إجراء.
-- [ ] Ordered cheapest→highest (API already sorted). First row `green-tint` bg +
-      «أقل سعر» badge.
-- [ ] Store cell: name → `/store/[slug]`, verified ✓ if `is_verified`,
-      `RatingBar` mini (4.6 + bar + count) — from store reviews (phase 13).
-- [ ] التوفر: `متوفر` / `آخر قطعة` (star-tint, stock=1) / `نفدت الكمية` (greyed row,
-      kept in position — brief).
-- [ ] آخر تحديث: relTime; **muted/faded if > 48h** (config `prices.stale_after_hours`).
-- [ ] إجراء: «إلى المتجر» text button via `/go/`; «احجز» outlined when stock>0.
+## Steps
 
-## 4. Price-history chart (brief §2.3)
-- [ ] `components/PriceChart.tsx` — hand-rolled responsive SVG (no chart lib):
-      green 2px line + soft gradient fill; dashed grey horizontal avg line;
-      small red marker at the max point; hover/touch tooltip (date + price + store);
-      range tabs ٣٠ يوم / ٩٠ يوم / سنة (client fetch per range).
-- [ ] Below the chart, the sentence that matters more than the chart:
-      **«أدنى سعر مسجّل: ١,٠٩٠ ر.س في ١٢ مارس.»** from `min_point`.
+### S1 — Page frame, header, gallery
+- **Do:** Server component fetching the detail endpoint by slug. Product
+  header (name Tajawal 32, brand + category breadcrumb links) and image
+  gallery (main + thumbs, next/image). 404 to not-found for unknown slugs.
+- **Touch:** `frontend/src/app/product/[slug]/page.tsx` + local components.
+- **Done when:** a seeded slug renders header + gallery SSR; an unknown slug
+  shows the 404 page.
 
-## 5. Price-alert box (brief §2.3)
-- [ ] Inline box: «نبّهني إذا نزل تحت [____] ر.س» + «فعّل التنبيه» button.
-      Input pre-filled with the historical low. Guest → redirects to login with `next`.
-      Authed → POST alert (phase 10 API); success state shows the active alert +
-      toggle. (Render now; wire fully in phase 10.)
+### S2 — Sticky best-price card
+- **Do:** «أفضل سعر الآن» label; price Mono 36px green; store + updated-ago
+  line. Primary solid green CTA «اذهب إلى المتجر» opening /go/{go_id} in a new
+  tab, with the 12px muted disclosure line underneath («قد نحصل على عمولة من
+  هذا الرابط. السعر لا يتغيّر عليك.»). Secondary outlined green «احجز مسبقًا»
+  linking to the booking start route — hidden when no store has stock. Action
+  row: favorite toggle + add-to-compare (fires the compared ping). Mobile:
+  the card becomes the bottom sticky bar.
+- **Touch:** product page + `ProductPageActions.tsx`.
+- **Done when:** CTA opens the affiliate redirect and the click counter
+  increments; the booking button hides when all seeded stocks are zero.
 
-## 6. Specs table
-- [ ] Two-column rows striped with `surface`, grouped under headers from `specs` JSON
-      groups (الشاشة، المعالج، الكاميرا، البطارية، الذاكرة…). Collapsible «عرض كل
-      المواصفات» beyond 12 rows.
+### S3 — Store price table
+- **Do:** The SRS "smart dynamic table" — columns المتجر | السعر (Mono) |
+  التوفر | آخر تحديث | إجراء. Cheapest→highest (API order). First row
+  green-tint + «أقل سعر» badge. Store cell links to /store/[slug] with the
+  verified mark and a mini RatingBar. التوفر states: متوفر / آخر قطعة
+  (star-tint, stock=1) / نفدت الكمية (greyed row kept in position). آخر تحديث
+  as relative time, faded when older than the stale threshold (48h, from
+  config via the API). Actions: «إلى المتجر» text button via /go/; «احجز»
+  outlined when stock>0.
+- **Touch:** product page table component.
+- **Done when:** seeded product shows correct order, tinted best row, greyed
+  unavailable rows in place, and faded stale timestamps.
 
-## 7. Verified reviews section (display only — write flow in phase 13)
-- [ ] Header: `4.6` (40px Mono) + bar + «٨٧ تقييمًا موثّقًا» for the **cheapest store**
-      by default with a store switcher pill row (reviews are per-store).
-- [ ] Review rows: name + small solid red ★ «موثّق» + «تمّ الاستلام في ٤ يونيو» + body.
-- [ ] One-line explainer under the header: «التقييم متاح فقط لمن أكمل حجزًا عبر المنصة.»
-      **No review button for visitors** (brief).
+### S4 — Price-history chart + insight sentence
+- **Do:** A hand-rolled responsive SVG chart component (no chart library):
+  green 2px line + soft gradient fill, dashed grey average line, small red
+  marker at the max point, hover/touch tooltip (date + price + store), range
+  tabs ٣٠ يوم / ٩٠ يوم / سنة (client refetch per range). Below it the
+  sentence that matters more than the chart: «أدنى سعر مسجّل: {price} ر.س في
+  {date}.» from min_point.
+- **Touch:** `frontend/src/components/PriceChart.tsx`, product page.
+- **Done when:** the chart matches seeded history for a sampled product;
+  range tabs refetch; the min sentence equals the seeded historical low.
 
-## 8. SEO (finalized in phase 20, wired now)
-- [ ] `generateMetadata`: auto title «سعر {name_ar} — يبدأ من {best_price} ر.س | أسعار»,
-      description from name+category+min price (SRS algorithm), OpenGraph image.
-- [ ] `<ProductJsonLd>` component: schema.org Product (name, image, brand, offers
-      with lowPrice/highPrice/offerCount/availability, aggregateRating from store ratings).
+### S5 — Alert box + specs table
+- **Do:** Inline alert box: «نبّهني إذا نزل تحت [____] ر.س» + «فعّل التنبيه»,
+  input pre-filled with the historical low; guest → login redirect preserving
+  intent; authed → calls the phase-10 endpoint (stub behind the client
+  interface until 10 lands), success state shows the active alert + toggle.
+  Specs table: two-column striped rows grouped under headers from the specs
+  JSON groups; collapsible «عرض كل المواصفات» beyond 12 rows.
+- **Touch:** product page components.
+- **Done when:** guest click routes to /login?next=…; specs groups render
+  from seed data with the collapse behavior.
 
-## Store profile page `(public)/store/[slug]/page.tsx` (small, belongs here)
-- [ ] Store header (logo, city, address, map link, verified badge, RatingBar large),
-      its product grid (`/api/products?store=`), reviews list. SSR + metadata.
+### S6 — Verified reviews section (display only)
+- **Do:** Header: rating number 40px Mono + bar + «{n} تقييمًا موثّقًا» for
+  the cheapest store by default, with a store-switcher pill row (reviews are
+  per-store). Review rows: first name + small solid red star «موثّق» badge +
+  «تمّ الاستلام في {date}» + body. Explainer line: «التقييم متاح فقط لمن
+  أكمل حجزًا عبر المنصة.» No write button for visitors (write flow is phase
+  13).
+- **Touch:** product page review components (reuse RatingBar, Star).
+- **Done when:** seeded approved reviews render for the selected store; the
+  switcher changes the list; no write UI appears.
 
-## Definition of Done
-- [ ] Seeded product renders: correct cheapest-first order, green-tint best row,
-      greyed unavailable rows in place, stale timestamps faded.
-- [ ] Chart matches seeded history; range tabs refetch; min sentence correct.
-- [ ] `/go/` click opens affiliate URL and increments `product_stats.clicks`.
-- [ ] View JSON-LD in page source validates in Google Rich Results test (structure-wise).
-- [ ] Mobile: sticky bottom CTA bar appears, columns stack.
+### S7 — SEO wiring
+- **Do:** generateMetadata — title «سعر {name_ar} — يبدأ من {best_price} ر.س |
+  أسعار», description from name + category + min price (SRS algorithm),
+  OpenGraph image. A ProductJsonLd component emitting schema.org Product with
+  offers (lowPrice/highPrice/offerCount/availability) and aggregateRating from
+  store ratings, JSON-safe-encoded. (Finalized/validated in phase 20.)
+- **Touch:** product page, `frontend/src/components/ProductJsonLd.tsx`.
+- **Done when:** page source shows the meta title per the algorithm and a
+  structurally valid JSON-LD block.
+
+### S8 — Store profile page
+- **Do:** `/store/[slug]` SSR: store header (logo, city, address, map link,
+  verified badge, large RatingBar), the store's product grid via the products
+  endpoint filtered by store, and its approved reviews list. Metadata per
+  store.
+- **Touch:** `frontend/src/app/store/[slug]/page.tsx`.
+- **Done when:** a seeded store renders header, grid, and reviews from live
+  data.
+
+## Phase acceptance
+- Full page verified in the browser against a seeded product: order/tints/
+  fading correct, chart + sentence correct, /go/ increments clicks, JSON-LD
+  structurally valid, mobile sticky bar appears, store page live.
