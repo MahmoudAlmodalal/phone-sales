@@ -50,9 +50,9 @@ export default function DashShell({
           <h1 className="page-h">{title}</h1>
         )}
 
-        <div className="tabs">
+        <div className="tabs overflow-x-auto no-scrollbar flex-nowrap">
           {tabs.map((t) => (
-            <Link key={t.href} href={t.href} className={pathname === t.href ? 'on' : ''}>
+            <Link key={t.href} href={t.href} className={`whitespace-nowrap flex-none ${pathname === t.href ? 'on' : ''}`}>
               {t.label}
               {t.alert ? <span className={t.alertAmber ? 'tab-alert amber' : 'tab-alert'}>{t.alert}</span> : null}
             </Link>

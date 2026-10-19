@@ -28,13 +28,13 @@ export default function DashboardLayout({
     <div className={`mx-auto max-w-[1200px] px-4 sm:px-6 ${dense ? 'py-5' : 'py-7'}`}>
       <h1 className="mb-5 text-2xl font-extrabold">{title}</h1>
 
-      <div className="mb-6 flex flex-wrap gap-1 border-b border-line">
+      <div className="mb-6 flex overflow-x-auto no-scrollbar flex-nowrap gap-1 border-b border-line pb-px">
         {tabs.map((t) => (
           <Link
             key={t.href}
             href={t.href}
             className={[
-              '-mb-px border-b-2 px-4 py-3 text-sm font-semibold transition-colors',
+              '-mb-px flex-none whitespace-nowrap border-b-2 px-4 py-3 text-sm font-semibold transition-colors',
               isActive(t) ? 'border-green text-green' : 'border-transparent text-muted hover:text-ink',
             ].join(' ')}
           >

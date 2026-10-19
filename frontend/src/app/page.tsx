@@ -110,8 +110,8 @@ export default async function Home() {
           {categories.map((c) => (
             <Link
               key={c.id}
-              href="/search"
-              className="group flex flex-col items-center justify-center gap-2.5 rounded-xl border border-line bg-paper p-4 transition-all hover:border-green hover:shadow-md"
+              href={`/search?brand=${encodeURIComponent(c.brand)}`}
+              className="group flex flex-col items-center justify-center gap-2.5 rounded-xl border border-line bg-paper p-4 transition-all hover:border-green hover:shadow-md active:scale-95"
             >
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface transition-colors group-hover:bg-green-tint">
                 <BrandLogo id={c.id} />

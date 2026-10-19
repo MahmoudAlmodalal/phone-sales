@@ -34,9 +34,31 @@ export default function Navbar() {
         setMenuOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        setMenuOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
 
   const links = [
     { href: '/', label: 'الرئيسية' },
@@ -257,10 +279,10 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
+        {/* Mobile Hamburger Button (44x44 minimum touch target) */}
         <button
-          className="ms-auto inline-flex h-10 w-10 items-center justify-center rounded-lg text-2xl text-white hover:bg-white/10 md:hidden"
-          aria-label="القائمة"
+          className="ms-auto inline-flex h-11 w-11 items-center justify-center rounded-lg text-2xl text-white transition-colors hover:bg-white/10 active:bg-white/20 focus-visible:outline-white md:hidden"
+          aria-label={open ? "إغلاق القائمة" : "فتح القائمة"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
@@ -268,34 +290,56 @@ export default function Navbar() {
         </button>
       </div>
 
+      {/* Backdrop overlay for mobile */}
+      {open && (
+        <div
+          className="fixed inset-0 top-16 z-30 bg-black/50 backdrop-blur-xs transition-opacity md:hidden"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Mobile Drawer */}
       {open && (
-        <div className="border-t border-white/15 bg-green-deep md:hidden">
-          <nav className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-3">
+        <div className="relative z-40 border-t border-white/15 bg-green-deep pb-safe shadow-xl md:hidden animate-in slide-in-from-top-2 duration-200">
+          <nav className="mx-auto flex max-w-[1200px] flex-col gap-1 px-4 py-4">
             {links.map((l) => (
               <Link
                 key={l.href + l.label}
                 href={l.href}
                 onClick={() => setOpen(false)}
                 className={[
-                  'rounded-lg px-3 py-3 text-sm font-medium',
-                  isActive(l.href) ? 'bg-white/15 text-white' : 'text-white/90 hover:bg-white/10',
+                  'flex items-center justify-between rounded-lg px-3.5 py-3 text-sm font-semibold transition-colors',
+                  isActive(l.href) ? 'bg-white/15 text-white' : 'text-white/90 hover:bg-white/10 active:bg-white/15',
                 ].join(' ')}
               >
-                {l.label}
+                <span>{l.label}</span>
+                <span className="text-white/50 text-xs">←</span>
               </Link>
             ))}
 
-            <div className="mt-2 flex flex-col gap-2 border-t border-white/15 pt-3">
+            <Link
+              href="/compare"
+              onClick={() => setOpen(false)}
+              className={[
+                'flex items-center justify-between rounded-lg px-3.5 py-3 text-sm font-semibold transition-colors',
+                isActive('/compare') ? 'bg-white/15 text-white' : 'text-white/90 hover:bg-white/10 active:bg-white/15',
+              ].join(' ')}
+            >
+              <span>جدول المقارنة</span>
+              <span className="text-white/50 text-xs">←</span>
+            </Link>
+
+            <div className="mt-3 flex flex-col gap-2.5 border-t border-white/15 pt-3.5">
               {authenticated ? (
                 <>
-                  <div className="flex items-center gap-3 px-2 py-1">
-                    <div className="relative h-9 w-9 overflow-hidden rounded-full border border-white/30 bg-white/10">
+                  <div className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2.5">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/30 bg-white/10 flex-none">
                       <Image
                         src={avatarUrl}
                         alt={userName}
-                        width={36}
-                        height={36}
+                        width={40}
+                        height={40}
                         className="h-full w-full object-cover"
                       />
                     </div>
@@ -304,30 +348,33 @@ export default function Navbar() {
                       <p className="truncate text-xs text-white/75" dir="ltr">{user?.email || ''}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Link
                       href="/account"
                       onClick={() => setOpen(false)}
-                      className="flex-1 rounded-field border border-white/50 px-4 py-2.5 text-center text-sm font-semibold text-white"
+                      className="flex h-11 items-center justify-center rounded-field border border-white/40 px-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/10 active:bg-white/20"
                     >
                       حسابي
                     </Link>
                     <button
+                      type="button"
                       onClick={handleLogout}
-                      className="flex-1 rounded-field bg-white px-4 py-2.5 text-sm font-semibold text-green"
+                      className="flex h-11 items-center justify-center rounded-field bg-white px-3 text-center text-sm font-semibold text-green transition-colors hover:bg-green-tint active:bg-white/90"
                     >
                       تسجيل الخروج
                     </button>
                   </div>
                 </>
               ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="rounded-field bg-white px-4 py-2.5 text-center text-sm font-semibold text-green"
-                >
-                  تسجيل الدخول
-                </Link>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="flex h-12 w-full items-center justify-center rounded-field bg-white px-4 text-sm font-bold text-green shadow-sm transition-colors hover:bg-green-tint active:bg-white/90"
+                  >
+                    تسجيل الدخول / إنشاء حساب
+                  </Link>
+                </div>
               )}
             </div>
           </nav>
@@ -336,3 +383,4 @@ export default function Navbar() {
     </header>
   );
 }
+
